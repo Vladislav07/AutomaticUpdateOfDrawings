@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.34407.143
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomaticUpdateOfDrawings", "AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings.csproj", "{CC4B059B-CA1B-48D1-9DA7-0FEA159BAAE5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CC4B059B-CA1B-48D1-9DA7-0FEA159BAAE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC4B059B-CA1B-48D1-9DA7-0FEA159BAAE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC4B059B-CA1B-48D1-9DA7-0FEA159BAAE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC4B059B-CA1B-48D1-9DA7-0FEA159BAAE5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {177260F8-0C60-4264-A8AD-95E525464936}
+	EndGlobalSection
+EndGlobal

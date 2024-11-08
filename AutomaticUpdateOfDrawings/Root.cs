@@ -1,6 +1,7 @@
 ﻿using EPDM.Interop.epdm;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,16 +15,27 @@ namespace AutomaticUpdateOfDrawings
         public static int ASMID;
         public static int ASMFolderID;
         public static string name0;
-        public static string pdmName;
-        public static string strFullBOM;
+        public static string pdmName = "CUBY_PDM";
+        public static string strFullBOM = "FullBOM";
+        public static string strConfig = ".";
+        public static string strFoundIn = "Found In"; 
         public static string strFileName;
-        public static string strDraw;           //= "Drawing";
-        public static string strDrawState;      //= "Drawing State";
-        public static string strRev;
+        public static string strDrawState = "Drawing State";
+        public static string strNeedsRegeneration = "NeedsRegeneration";
+        public static string strLatestVer = "Latest Version";
+        public static string strRev = "RefVersion";
+        public static string strPartNumber = "Обозначение";
+        public static string strDescription_RUS = "Наименование";
+        public static string strConfigPoint = ".";
+        public static string strErC;
+        public static string strFileID;
+        public static string strFolderID;
         public static EdmSelItem[] ppoSelection;
         public static List<EdmSelItem> SelectionDrawings;
         public static List<string> listdrawings;
         public static IEdmBatchUnlock2 batchUnlocker;
+   
+
         public void OnCmd(string pathAss)
         {
             string FileName = pathAss;

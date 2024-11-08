@@ -1,5 +1,5 @@
 ﻿
-namespace FullBomHoum
+namespace AutomaticUpdateOfDrawings
 {
     partial class Form1
     {

@@ -14,12 +14,10 @@ namespace AutomaticUpdateOfDrawings
     {
         static IEdmVault5 vault1 = new EdmVault5();
 
-        IEdmBatchUnlock2 batchUnlocker;
-        IEdmSelectionList6 fileList = null;
-        EdmSelectionObject poSel;
 
-        int fileCount = 0;
-        static int i = 0;
+        // IEdmSelectionList6 fileList = null;
+        // EdmSelectionObject poSel;
+
 
 
         public static void BOM(IEdmFile7 aFile, string config, int version, int BomFlag, ref DataTable dt)
@@ -31,13 +29,22 @@ namespace AutomaticUpdateOfDrawings
             bomView.GetRows(out object[] ppoRows);
             bomView.GetColumns(out EdmBomColumn[] ppoColumns);
 
-
             //Заполняем таблицу dt данными из BOM
             if (ppoRows.Length > 0)//Отбрасываем пустые сборки
             {
-    
+                if (dt.Columns.Contains(Root.strPartNumber) == false)
+                {
+                    dt.Columns.Add(Root.strFileID, typeof(int));
+                    dt.Columns.Add(Root.strFolderID, typeof(int));
+                    dt.Columns.Add(Root.strFileName, typeof(string));
+                    dt.Columns.Add(Root.strFoundIn, typeof(string));
+                    dt.Columns.Add(Root.strLatestVer, typeof(int));
+                    dt.Columns.Add(Root.strRev, typeof(int));
+                    dt.Columns.Add(Root.strDrawState, typeof(string));
+                    dt.Columns.Add(Root.strNeedsRegeneration, typeof(bool));
+                }
 
-                //Построчно добавляем строки из BOM в таблицу dt с нужной доп информацией 
+
                 foreach (IEdmBomCell ppoRow in ppoRows)
                 {
                     ForColi(ppoRow, ppoColumns, aFile.Name.ToString(), dt);
@@ -46,7 +53,7 @@ namespace AutomaticUpdateOfDrawings
 
         }
 
-        static void ForColi(IEdmBomCell Row, EdmBomColumn[] ppoColumns, string aFileName,  DataTable dt)
+        static void ForColi(IEdmBomCell Row, EdmBomColumn[] ppoColumns, string aFileName, DataTable dt)
         {
             string f = "";//Found In
             IEdmFile7 bFile;
@@ -57,17 +64,23 @@ namespace AutomaticUpdateOfDrawings
             DataRow workRow = dt.NewRow();
             object poValue = null;
             object poComputedValue = null;
-           // string pbsConfiguration = "";
-           // bool pbReadOnly = false;
- 
+            string pbsConfiguration = "";
+            bool pbReadOnly = false;
+            int refDrToModel = -1;
+            bool NeedsRegeneration = false;
+            IEdmFile7 modelFile = null;
 
             if (Row.GetTreeLevel() == 1 || Row.GetTreeLevel() == 0)
             {
                 for (int Coli = 0; Coli < ppoColumns.Length; Coli++)
 
                 {
-                  
+                    if (ppoColumns[Coli].mbsCaption.Contains(Root.strFoundIn))
+                    {
+                        Row.GetVar(ppoColumns[Coli].mlVariableID, ppoColumns[Coli].meType, out poValue, out poComputedValue, out pbsConfiguration, out pbReadOnly);
+                        f = poComputedValue.ToString();
 
+                    }
                     //Если деталь или сборка, то вносим в таблицу с информацией о наличии чертежа и dxf, иначе игнорим
                     if (ppoColumns[Coli].mbsCaption.Contains(Root.strFileName))
                     {
@@ -88,34 +101,36 @@ namespace AutomaticUpdateOfDrawings
                         else if (poComputedValue.ToString().Contains(".sldprt"))
                         {
                             TrueRowFlag = true; d = p.Replace(".sldprt", ".SLDDRW");
-           
+
                         }
                         else if (poComputedValue.ToString().Contains(".SLDPRT"))
                         {
                             TrueRowFlag = true; d = p.Replace(".SLDPRT", ".SLDDRW");
-                        
+
                         }
 
 
                         //Проверяем есть ли зачекиненный чертеж в папке с деталью с именем соответствующим детали
                         if (!vault1.IsLoggedIn) { vault1.LoginAuto(Root.pdmName, 0); }
+                        modelFile = (IEdmFile7)vault1.GetFileFromPath(p, out IEdmFolder5 modelFolder);
                         bFile = (IEdmFile7)vault1.GetFileFromPath(d, out IEdmFolder5 bFolder);
-
-                        int refDrToModel = -1;
-                        bool isValiddrawing = false;
-
 
                         if ((bFile != null) && (!bFile.IsLocked)) //true если файл не пусто и зачекинен                                           
                         {
-                            workRow[Root.strDraw] = true;
-                            workRow[Root.strDrawState] = bFile.CurrentState.Name.ToString();
                             try
                             {
+                                workRow[Root.strFileID] = bFile.ID;
+                                workRow[Root.strFolderID] = bFolder.ID;
+                                workRow[Root.strFileName] = p;
+
+                                workRow[Root.strFoundIn] = f;
+                                workRow[Root.strDrawState] = bFile.CurrentState.Name.ToString();
+
+
                                 int versionDraiwing = bFile.CurrentVersion;
 
-                                List<string> listDrawings = new List<string>();
 
-                                isValiddrawing = bFile.NeedsRegeneration(versionDraiwing, bFolder.ID);
+                                NeedsRegeneration = bFile.NeedsRegeneration(versionDraiwing, bFolder.ID);
 
                                 // Достаем из чертежа версию ссылки на родителя (VersionRef)
                                 IEdmReference5 ref5 = bFile.GetReferenceTree(bFolder.ID);
@@ -129,7 +144,6 @@ namespace AutomaticUpdateOfDrawings
                                     string extension = Path.GetExtension(@ref.Name);
                                     if (extension == ".sldasm" || extension == ".sldprt" || extension == ".SLDASM" || extension == ".SLDPRT")
                                     {
-                                        workRow[Root.strRev] = @ref.VersionRef.ToString();
                                         refDrToModel = @ref.VersionRef;
                                         break;
                                     }
@@ -144,35 +158,13 @@ namespace AutomaticUpdateOfDrawings
                                 MessageBox.Show("error:" + bFile.Name);
 
                             }
-                            IEdmFile7 modelFile = (IEdmFile7)vault1.GetFileFromPath(p, out IEdmFolder5 modelFolder);
-                            if (!(refDrToModel == modelFile.CurrentVersion) || isValiddrawing)
-                            {
-                               // writeNameToTxt(bFile.Name + "vers :" + workRow[Root.strRev] + " - " + workRow[Root.strLatestVer] + " Is - " + isValiddrawing.ToString());
-                                EdmSelItem selItem = new EdmSelItem();
-                                selItem.mlDocID = bFile.ID;
-                                selItem.mlProjID = bFolder.ID;
-                                Root.SelectionDrawings.Add(selItem);
-                                Root.listdrawings.Add(bFile.GetLocalPath(bFolder.ID));
 
 
-                            }
-                            else
-                            {
-                                // MessageBox.Show(bFile.Name);
-                            }
 
                         }
 
                     }
 
-
-                 
-
-                    //Заполняем колонки
-                    Row.GetVar(ppoColumns[Coli].mlVariableID, ppoColumns[Coli].meType, out poValue, out poComputedValue, out pbsConfiguration, out pbReadOnly);
-                    workRow[Coli] = poComputedValue.ToString();
-
-            
                 }
             }
 
@@ -181,68 +173,9 @@ namespace AutomaticUpdateOfDrawings
             { TrueRowFlag = false; }//если не первый левел или не 0 левел
 
 
-            if (TrueRowFlag == true)
+            if (TrueRowFlag == true && (!(refDrToModel == modelFile.CurrentVersion) || NeedsRegeneration))
             {
-                //ПРОВЕРКИ
-                workRow[Root.strErC] = 0;//Количество ошибок в строке
 
-                string regCuby = @"^CUBY-\d{8}$";
-                string fileName = workRow[Root.strFileName].ToString();
-                string[] parts = fileName.Split('.');
-                string cuteFileName = parts[0].ToString();
-                bool IsCUBY = Regex.IsMatch(cuteFileName, regCuby);
-
-                //1. Проверка на наличие чертежа
-                if (workRow[Root.strDraw].ToString() == ""
-                    && (workRow[Root.strSection].ToString() == "Детали"
-                    || workRow[Root.strSection].ToString() == "Сборочные единицы")
-                    && (workRow[Root.strState].ToString() != Root.strPrelim)
-                    && workRow[Root.strNoSHEETS].ToString() != "1")
-                { workRow[Root.strErC] = Convert.ToInt16(workRow[Root.strErC]) + 1; } //Количество ошибок в строке
-
-
-                //8. Проверка деталей и сборок в статусе Initiated
-                if ((workRow[Root.strSection].ToString() == "Детали" || workRow[Root.strSection].ToString() == "Сборочные единицы")
-                    && workRow[Root.strState].ToString() == Root.strInitiated)
-                { workRow[Root.strErC] = Convert.ToInt16(workRow[Root.strErC]) + 1; }//Количество ошибок в строке
-
-                //8.1 Проверка деталей и сборок в статусах "r_In Work" "r_На проверке" "Подтверждение ведущего" (статусы потока удаленщиков, не должно быть в таком)
-                if ((workRow[Root.strSection].ToString() == "Детали" || workRow[Root.strSection].ToString() == "Сборочные единицы")
-                    && (workRow[Root.strState].ToString() == "r_In Work" ||
-                        workRow[Root.strState].ToString() == "r_На проверке" ||
-                        workRow[Root.strState].ToString() == "Подтверждение Ведущего"))
-                { workRow[Root.strErC] = Convert.ToInt16(workRow[Root.strErC]) + 1; }//Количество ошибок в строке
-
-
-                //9. Проверка покупных в статусе In Work
-                if ((workRow[Root.strSection].ToString() == "Прочие изделия"
-                    || workRow[Root.strSection].ToString() == "Стандартные изделия"
-                    || workRow[Root.strSection].ToString() == "Материалы")
-                        && workRow[Root.strState].ToString() == Root.strInWork)
-                { workRow[Root.strErC] = Convert.ToInt16(workRow[Root.strErC]) + 1; }//Количество ошибок в строке
-
-
-                //10. Проверка равенства состояния чертежа и детали или сборки
-                if (workRow[Root.strDraw].ToString() == "True"
-                    && workRow[Root.strState].ToString() != workRow[Root.strDrawState].ToString())
-                { workRow[Root.strErC] = Convert.ToInt16(workRow[Root.strErC]) + 1; }//Количество ошибок в строке
-
-
-
-
-
-
-       
-
-           
-
-
-        
-
- 
-
-               
-            
 
                 dt.Rows.Add(workRow);
             }
@@ -253,25 +186,24 @@ namespace AutomaticUpdateOfDrawings
                 {
                     string conf = workRow[dt.Columns.IndexOf(Root.strConfig)].ToString();
                     int vers = Convert.ToInt16(workRow[dt.Columns.IndexOf(Root.strLatestVer)]);//Последняя версия файла в PDM
-                                                                                                        // int vers = Convert.ToInt16(workRow[dt.Columns.IndexOf(Root.strFoundInVer)]); //Версия используемая в сборке
+                                                                                               // int vers = Convert.ToInt16(workRow[dt.Columns.IndexOf(Root.strFoundInVer)]); //Версия используемая в сборке
                     string pathFile = workRow[dt.Columns.IndexOf(Root.strFoundIn)].ToString() + "\\" + workRow[dt.Columns.IndexOf(Root.strFileName)].ToString();
-                    int qtyZfile = Convert.ToInt16(workRow[dt.Columns.IndexOf(Root.strTQTY)]);
                     if (!vault1.IsLoggedIn) { vault1.LoginAuto(Root.pdmName, 0); }
                     IEdmFile7 zFile = (IEdmFile7)vault1.GetFileFromPath(pathFile, out IEdmFolder5 zFolder);
 
-                    if (zFile != null) { BOM(zFile, conf, vers, 0, qtyZfile, ref dt); }//1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
+                    if (zFile != null) { BOM(zFile, conf, vers, 0, ref dt); }//1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
                 }
             }
 
-       
 
-  
+        }
 
-         
-        
-     
 
-        public void SldOpenFile()
+
+
+
+
+        void SldOpenFile()
         {
             try
             {
@@ -291,3 +223,5 @@ namespace AutomaticUpdateOfDrawings
 
         }
     }
+}
+    

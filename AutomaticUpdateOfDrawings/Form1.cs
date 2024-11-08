@@ -48,7 +48,7 @@ namespace AutomaticUpdateOfDrawings
         {
         
 
-            BOM_dt.BOM(aFile, config, version, 2, 1, ref dt);///1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
+            BOM_dt.BOM(aFile, config, version, 2, 1, ref dt2);///1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
     
    
         }

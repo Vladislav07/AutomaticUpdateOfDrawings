@@ -30,6 +30,7 @@ namespace AutomaticUpdateOfDrawings
         public static string strErC;
         public static string strFileID;
         public static string strFolderID;
+        public static string strSection;
         public static EdmSelItem[] ppoSelection;
         public static List<EdmSelItem> SelectionDrawings;
         public static List<string> listdrawings;

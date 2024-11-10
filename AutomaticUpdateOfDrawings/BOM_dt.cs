@@ -14,12 +14,6 @@ namespace AutomaticUpdateOfDrawings
     {
         static IEdmVault5 vault1 = new EdmVault5();
 
-
-        // IEdmSelectionList6 fileList = null;
-        // EdmSelectionObject poSel;
-
-
-
         public static void BOM(IEdmFile7 aFile, string config, int version, int BomFlag, ref DataTable dt)
 
         {
@@ -69,6 +63,7 @@ namespace AutomaticUpdateOfDrawings
             int refDrToModel = -1;
             bool NeedsRegeneration = false;
             IEdmFile7 modelFile = null;
+           
 
             if (Row.GetTreeLevel() == 1 || Row.GetTreeLevel() == 0)
             {
@@ -81,6 +76,27 @@ namespace AutomaticUpdateOfDrawings
                         f = poComputedValue.ToString();
 
                     }
+                    if (ppoColumns[Coli].mbsCaption.Contains(Root.strLatestVer))
+                    {
+                        Row.GetVar(ppoColumns[Coli].mlVariableID, ppoColumns[Coli].meType, out poValue, out poComputedValue, out pbsConfiguration, out pbReadOnly);
+                        workRow[Root.strLatestVer] = (int)poComputedValue;
+
+                    }
+
+                    if (ppoColumns[Coli].mbsCaption.Contains(Root.strConfig))
+                    {
+                        Row.GetVar(ppoColumns[Coli].mlVariableID, ppoColumns[Coli].meType, out poValue, out poComputedValue, out pbsConfiguration, out pbReadOnly);
+                        workRow[Root.strConfig] = (int)poComputedValue;
+
+                    }
+                    if (ppoColumns[Coli].mbsCaption.Contains(Root.strSection))
+                    {
+                        Row.GetVar(ppoColumns[Coli].mlVariableID, ppoColumns[Coli].meType, out poValue, out poComputedValue, out pbsConfiguration, out pbReadOnly);
+                        workRow[Root.strSection] = (int)poComputedValue;
+
+                    }
+
+
                     //Если деталь или сборка, то вносим в таблицу с информацией о наличии чертежа и dxf, иначе игнорим
                     if (ppoColumns[Coli].mbsCaption.Contains(Root.strFileName))
                     {
@@ -88,6 +104,7 @@ namespace AutomaticUpdateOfDrawings
                         Row.GetVar(ppoColumns[Coli].mlVariableID, ppoColumns[Coli].meType, out poValue, out poComputedValue, out pbsConfiguration, out pbReadOnly);
                         string p = f + "\\" + poComputedValue.ToString();       //Путь к файлу детали или сборки
                         string d = "";                                          //Путь к файлу чертежа
+
 
 
                         if (poComputedValue.ToString().Contains(".sldasm"))
@@ -109,10 +126,13 @@ namespace AutomaticUpdateOfDrawings
 
                         }
 
+                       
+
 
                         //Проверяем есть ли зачекиненный чертеж в папке с деталью с именем соответствующим детали
                         if (!vault1.IsLoggedIn) { vault1.LoginAuto(Root.pdmName, 0); }
                         modelFile = (IEdmFile7)vault1.GetFileFromPath(p, out IEdmFolder5 modelFolder);
+
                         bFile = (IEdmFile7)vault1.GetFileFromPath(d, out IEdmFolder5 bFolder);
 
                         if ((bFile != null) && (!bFile.IsLocked)) //true если файл не пусто и зачекинен                                           
@@ -121,7 +141,7 @@ namespace AutomaticUpdateOfDrawings
                             {
                                 workRow[Root.strFileID] = bFile.ID;
                                 workRow[Root.strFolderID] = bFolder.ID;
-                                workRow[Root.strFileName] = p;
+                                workRow[Root.strFileName] = d;
 
                                 workRow[Root.strFoundIn] = f;
                                 workRow[Root.strDrawState] = bFile.CurrentState.Name.ToString();
@@ -182,46 +202,17 @@ namespace AutomaticUpdateOfDrawings
 
             if (Row.GetTreeLevel() == 1)
             {
-                if (workRow[dt.Columns.IndexOf(Root.strFileName)].ToString().Contains(".sldasm") || workRow[dt.Columns.IndexOf(Root.strFileName)].ToString().Contains(".SLDASM"))
+                if (workRow[dt.Columns.IndexOf(Root.strSection)].ToString().Contains("Сборочные единицы"))
                 {
                     string conf = workRow[dt.Columns.IndexOf(Root.strConfig)].ToString();
                     int vers = Convert.ToInt16(workRow[dt.Columns.IndexOf(Root.strLatestVer)]);//Последняя версия файла в PDM
-                                                                                               // int vers = Convert.ToInt16(workRow[dt.Columns.IndexOf(Root.strFoundInVer)]); //Версия используемая в сборке
-                    string pathFile = workRow[dt.Columns.IndexOf(Root.strFoundIn)].ToString() + "\\" + workRow[dt.Columns.IndexOf(Root.strFileName)].ToString();
-                    if (!vault1.IsLoggedIn) { vault1.LoginAuto(Root.pdmName, 0); }
-                    IEdmFile7 zFile = (IEdmFile7)vault1.GetFileFromPath(pathFile, out IEdmFolder5 zFolder);
-
-                    if (zFile != null) { BOM(zFile, conf, vers, 0, ref dt); }//1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
+                    if (modelFile != null) { BOM(modelFile, conf, vers, 0, ref dt); }//1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
                 }
             }
 
 
         }
 
-
-
-
-
-
-        void SldOpenFile()
-        {
-            try
-            {
-
-                SldApp sldApp = null;
-                sldApp = new SldApp();
-                sldApp.AddDrawingsToBatchGet();
-                sldApp.BatchGet();
-                sldApp.Metod();
-                sldApp.DrawingsBatchUnLock();
-            }
-            catch (Exception)
-            {
-
-                throw;
-            }
-
-        }
     }
 }
     

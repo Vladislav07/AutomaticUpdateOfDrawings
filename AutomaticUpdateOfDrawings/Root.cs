@@ -19,7 +19,7 @@ namespace AutomaticUpdateOfDrawings
         public static string strFullBOM = "FullBOM";
         public static string strConfig = ".";
         public static string strFoundIn = "Found In"; 
-        public static string strFileName;
+        public static string strFileName = "File_Name";
         public static string strDrawState = "Drawing State";
         public static string strNeedsRegeneration = "NeedsRegeneration";
         public static string strLatestVer = "Latest Version";
@@ -30,7 +30,7 @@ namespace AutomaticUpdateOfDrawings
         public static string strErC;
         public static string strFileID;
         public static string strFolderID;
-        public static string strSection;
+        public static string strSection = "Раздел";
         public static EdmSelItem[] ppoSelection;
         public static List<EdmSelItem> SelectionDrawings;
         public static List<string> listdrawings;

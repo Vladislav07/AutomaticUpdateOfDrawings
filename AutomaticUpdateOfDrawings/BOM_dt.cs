@@ -179,7 +179,12 @@ namespace AutomaticUpdateOfDrawings
 
                             }
 
+                            if (TrueRowFlag == true && (!(refDrToModel == modelFile.CurrentVersion) || NeedsRegeneration))
+                                    {
 
+
+                                        dt.Rows.Add(workRow);
+                                    }
 
                         }
 
@@ -193,12 +198,7 @@ namespace AutomaticUpdateOfDrawings
             { TrueRowFlag = false; }//если не первый левел или не 0 левел
 
 
-            if (TrueRowFlag == true && (!(refDrToModel == modelFile.CurrentVersion) || NeedsRegeneration))
-            {
-
-
-                dt.Rows.Add(workRow);
-            }
+            
 
             if (Row.GetTreeLevel() == 1)
             {

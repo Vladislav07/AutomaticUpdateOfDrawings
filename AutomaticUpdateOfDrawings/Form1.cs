@@ -13,12 +13,13 @@ namespace AutomaticUpdateOfDrawings
     {
         public string pathname0;
 
-        public System.Data.DataTable dt2;
+        public System.Data.DataTable dt;
 
         IEdmFile7 aFile;
         IEdmFolder5 aFolder;
         IEdmBomMgr bomMgr;
-   
+        string config;
+        int version = -1;
 
         public IEdmVault5 vault1 = new EdmVault5();
         public IEdmVault7 vault2 = null;
@@ -27,18 +28,18 @@ namespace AutomaticUpdateOfDrawings
 
         public Form1()
         {    
-            vault2 = (IEdmVault7)vault1;
+           
 
             if (!vault1.IsLoggedIn) { vault1.LoginAuto(Root.pdmName, this.Handle.ToInt32()); }
+             vault2 = (IEdmVault7)vault1;
 
             aFile = (IEdmFile7)vault1.GetObject(EdmObjectType.EdmObject_File, Root.ASMID);
             aFolder = (IEdmFolder5)vault1.GetObject(EdmObjectType.EdmObject_Folder, Root.ASMFolderID);
-
+            config = Root.strConfig;
+            version = aFile.CurrentVersion;
             pathname0 = aFolder.LocalPath;
-            this.Text = (pathname0 + "\\" + aFile.Name);
-
-            bomMgr = (IEdmBomMgr)vault2.CreateUtility(EdmUtility.EdmUtil_BomMgr);
-           // bomMgr.GetBomLayouts(out EdmBomLayout[] ppoRetLayouts);       
+           dt = new System.Data.DataTable();
+           BOM_dt.BOM(aFile, config, version, 1, ref dt);///1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
         }
       
    
@@ -46,11 +47,13 @@ namespace AutomaticUpdateOfDrawings
 
         void Data_output()
         {
-        
 
-            BOM_dt.BOM(aFile, config, version, 2, 1, ref dt2);///1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
-    
-   
+            this.Cursor = Cursors.WaitCursor;
+            
+            this.bindingSource1.DataSource = dt;
+           
+            this.Cursor = Cursors.Arrow;
+
         }
      
 

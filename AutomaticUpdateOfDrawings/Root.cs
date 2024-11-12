@@ -17,12 +17,12 @@ namespace AutomaticUpdateOfDrawings
         public static string name0;
         public static string pdmName = "CUBY_PDM";
         public static string strFullBOM = "FullBOM";
-        public static string strConfig = ".";
-        public static string strFoundIn = "Found In"; 
+        public static string strConfig = "Configuration";
+        public static string strFoundIn = "Found_In"; 
         public static string strFileName = "File_Name";
         public static string strDrawState = "Drawing State";
         public static string strNeedsRegeneration = "NeedsRegeneration";
-        public static string strLatestVer = "Latest Version";
+        public static string strLatestVer = "Latest_Version";
         public static string strRev = "RefVersion";
         public static string strPartNumber = "Обозначение";
         public static string strDescription_RUS = "Наименование";
@@ -30,7 +30,7 @@ namespace AutomaticUpdateOfDrawings
         public static string strErC;
         public static string strFileID;
         public static string strFolderID;
-        public static string strSection = "Раздел";
+        public static string strSection = "Section";
         public static EdmSelItem[] ppoSelection;
         public static List<EdmSelItem> SelectionDrawings;
         public static List<string> listdrawings;

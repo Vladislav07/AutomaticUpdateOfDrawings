@@ -38,8 +38,8 @@ namespace AutomaticUpdateOfDrawings
             config = Root.strConfig;
             version = aFile.CurrentVersion;
             pathname0 = aFolder.LocalPath;
-           dt = new System.Data.DataTable();
-           BOM_dt.BOM(aFile, config, version, 1, ref dt);///1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
+            dt = new System.Data.DataTable();
+            BOM_dt.BOM(aFile, config, version, 1);///1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
         }
       
    

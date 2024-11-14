@@ -13,8 +13,9 @@ namespace AutomaticUpdateOfDrawings
     public class BOM_dt
     {
         static IEdmVault5 vault1 = new EdmVault5();
+        static SldApp sldApp = null;
 
-        public static void BOM(IEdmFile7 aFile, string config, int version, int BomFlag, ref DataTable dt)
+        public static void BOM(IEdmFile7 aFile, string config, int version, int BomFlag)
 
         {
             IEdmBomView bomView;
@@ -22,29 +23,24 @@ namespace AutomaticUpdateOfDrawings
             bomView = aFile.GetComputedBOM(Root.strFullBOM, version, config, BomFlag); //1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
             bomView.GetRows(out object[] ppoRows);
             bomView.GetColumns(out EdmBomColumn[] ppoColumns);
-
-            dt.Columns.Add(Root.strFileID, typeof(int));
-            dt.Columns.Add(Root.strFolderID, typeof(int));
-            dt.Columns.Add(Root.strFileName, typeof(string));
-            dt.Columns.Add(Root.strFoundIn, typeof(string));
-            dt.Columns.Add(Root.strLatestVer, typeof(int));
-            dt.Columns.Add(Root.strRev, typeof(int));
-            dt.Columns.Add(Root.strDrawState, typeof(string));
-            dt.Columns.Add(Root.strNeedsRegeneration, typeof(bool));
-            dt.Columns.Add(Root.strSection, typeof(string));
-            dt.Columns.Add(Root.strConfig, typeof(string));
-
+    
             if (ppoRows.Length > 0)
             {             
                 foreach (IEdmBomCell ppoRow in ppoRows)
                 {
-                    ForColi(ppoRow, ppoColumns, aFile.Name.ToString(), ref dt);
+                    ForColi(ppoRow, ppoColumns, aFile.Name.ToString());
                 }
+            }
+
+            if (Root.drawings.Count > 0)
+            {
+                sldApp = new SldApp();
+                sldApp.Run();
             }
 
         }
 
-        static void ForColi(IEdmBomCell Row, EdmBomColumn[] ppoColumns, string aFileName,ref DataTable dt)
+        static void ForColi(IEdmBomCell Row, EdmBomColumn[] ppoColumns, string aFileName)
         {
             string f = "";//Found In
             IEdmFile7 bFile;
@@ -52,16 +48,20 @@ namespace AutomaticUpdateOfDrawings
 
 
             bool TrueRowFlag = false;
-            DataRow workRow = dt.NewRow();
+           // DataRow workRow = dt.NewRow();
             object poValue = null;
             object poComputedValue = null;
             string pbsConfiguration = "";
             bool pbReadOnly = false;
             int refDrToModel = -1;
             bool NeedsRegeneration = false;
+            int LatestVer = -1;
+            string Config = "";
+            string Section = "";
             IEdmFile7 modelFile = null;
             string p="";
             string d="";
+            Drawing draw = null;
 
             if (Row.GetTreeLevel() == 1 || Row.GetTreeLevel() == 0)
             {
@@ -74,26 +74,27 @@ namespace AutomaticUpdateOfDrawings
                         f = poComputedValue.ToString();
 
                     }
-                    /*
+                   /*
                     if (ppoColumns[Coli].mbsCaption.Contains(Root.strLatestVer))
                     {
                         Row.GetVar(ppoColumns[Coli].mlVariableID, ppoColumns[Coli].meType, out poValue, out poComputedValue, out pbsConfiguration, out pbReadOnly);
-                        workRow[Root.strLatestVer] = (int)poComputedValue;
+                        LatestVer = (int)poComputedValue;
 
                     }
-                    */
+                   */
+                  
 
                     if (ppoColumns[Coli].mbsCaption.Contains(Root.strConfig))
                     {
                         Row.GetVar(ppoColumns[Coli].mlVariableID, ppoColumns[Coli].meType, out poValue, out poComputedValue, out pbsConfiguration, out pbReadOnly);
-                        workRow[Root.strConfig] = poComputedValue.ToString();
+                        Config = poComputedValue.ToString();
 
                     }
                     if (ppoColumns[Coli].mbsCaption.Contains(Root.strSection))
                     {
                         Row.GetVar(ppoColumns[Coli].mlVariableID, ppoColumns[Coli].meType, out poValue, out poComputedValue, out pbsConfiguration, out pbReadOnly);
 
-                        workRow[Root.strSection] = poComputedValue.ToString();
+                        Section = poComputedValue.ToString();
 
                     }
 
@@ -139,19 +140,10 @@ namespace AutomaticUpdateOfDrawings
 
                 if ((bFile != null) && (!bFile.IsLocked)) //true если файл не пусто и зачекинен                                           
                 {
+                    draw = new Drawing(bFile.ID, bFolder.ID, d);
                     try
                     {
-                        workRow[Root.strFileID] = bFile.ID;
-                        workRow[Root.strFolderID] = bFolder.ID;
-                        workRow[Root.strFileName] = d;
-
-                        workRow[Root.strFoundIn] = f;
-                        workRow[Root.strDrawState] = bFile.CurrentState.Name.ToString();
-
-
                         int versionDraiwing = bFile.CurrentVersion;
-
-
                         NeedsRegeneration = bFile.NeedsRegeneration(versionDraiwing, bFolder.ID);
 
                         // Достаем из чертежа версию ссылки на родителя (VersionRef)
@@ -175,7 +167,7 @@ namespace AutomaticUpdateOfDrawings
                             }
                         }
 
-                         dt.Rows.Add(workRow);
+                        Root.drawings.Add(draw);
                     }
                     catch (Exception ex)
                     {
@@ -199,16 +191,17 @@ namespace AutomaticUpdateOfDrawings
 
             if (Row.GetTreeLevel() == 1)
             {
-                if (workRow[dt.Columns.IndexOf(Root.strSection)].ToString().Contains("Сборочные единицы"))
+                if (Section == "Сборочные единицы")
                 {
-                    string conf = workRow[dt.Columns.IndexOf(Root.strConfig)].ToString();
-                    int vers = Convert.ToInt16(workRow[dt.Columns.IndexOf(Root.strLatestVer)]);//Последняя версия файла в PDM
-                    if (modelFile != null) { BOM(modelFile, conf, vers, 0, ref dt); }//1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
+              
+                    if (modelFile != null) { BOM(modelFile, Config, LatestVer, 0); }//1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
                 }
             }
 
 
         }
+
+
 
     }
 }

@@ -10,16 +10,15 @@ using EPDM.Interop.epdm;
 using Microsoft.VisualBasic;
 using System.Windows.Forms;
 using System.Data;
+using System.IO;
 
 namespace AutomaticUpdateOfDrawings
 {
     public class SldApp
     {
         SldWorks swApp;
-        public DataTable dt3;
 
-        Action<string> ActionOpenFile;
-        List<string> drawings;
+
         IEdmBatchGet batchGetter;
         EdmSelItem[] ppoSelection = null;
         IEdmVault5 vault1 = new EdmVault5();
@@ -29,30 +28,26 @@ namespace AutomaticUpdateOfDrawings
         IEdmBatchUnlock2 batchUnlocker;
 
 
-        public SldApp(DataTable dt2)
+        public SldApp()
         {
             swApp = new SldWorks();
-            dt3 = dt2;
             swApp.Visible = true;
-            ppoSelection = new EdmSelItem[Root.SelectionDrawings.Count];
-
-
+            ppoSelection = new EdmSelItem[Root.drawings.Count];
         }
 
-        public bool IsDrawingsRegeneration()
+        public void Run()
         {
-            foreach (DataRow workRow in dt3.Rows)
+            Message();
+        }
+
+        void Message()
+        {
+            string str = "";
+            foreach (Drawing item in Root.drawings)
             {
-                int i = (int)workRow[Root.strFileID];
+                str = str + Path.GetFileName(item.NameDraw);
             }
-            if (drawings.Count > 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            MessageBox.Show(str);
         }
 
         public void AddDrawingsToBatchGet()
@@ -67,9 +62,9 @@ namespace AutomaticUpdateOfDrawings
 
                 batchGetter = (IEdmBatchGet)vault2.CreateUtility(EdmUtility.EdmUtil_BatchGet);
 
-                foreach (EdmSelItem item in Root.SelectionDrawings)
+                foreach (Drawing item in Root.drawings)
                 {
-                    batchGetter.AddSelectionEx((EdmVault5)vault1, item.mlDocID, item.mlProjID, 0);
+                    batchGetter.AddSelectionEx((EdmVault5)vault1, item.ID_File, item.ID_Folder, 0);
                 }
 
             }
@@ -91,9 +86,11 @@ namespace AutomaticUpdateOfDrawings
             try
             {
 
-                foreach (EdmSelItem item in Root.SelectionDrawings)
+                foreach (Drawing item in Root.drawings)
                 {
-                    ppoSelection[i] = item;
+                    ppoSelection[i] = new EdmSelItem();
+                    ppoSelection[i].mlDocID = item.ID_File;
+                    ppoSelection[i].mlProjID = item.ID_Folder;
                     i++;
                 }
 
@@ -184,12 +181,10 @@ namespace AutomaticUpdateOfDrawings
 
         }
 
-        public void Metod()
+        public void OpenAndRefresh()
         {
             ModelDoc2 swModelDoc = default(ModelDoc2);
-            Frame swFrame = default(Frame);
-            ModelWindow swModelWindow = default(ModelWindow);
-            object[] modelWindows = null;
+
             int errors = 0;
             int warnings = 0;
             int lErrors = 0;
@@ -197,12 +192,12 @@ namespace AutomaticUpdateOfDrawings
 
             string fileName = null;
 
-            ModelDocExtension modelDocExt;
+      
             try
             {
-                foreach (string item in drawings)
+                foreach (Drawing item in Root.drawings)
                 {
-                    fileName = item;
+                    fileName = item.NameDraw;
                     swModelDoc = (ModelDoc2)swApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocDRAWING, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
 
                     swApp.CreateNewWindow();

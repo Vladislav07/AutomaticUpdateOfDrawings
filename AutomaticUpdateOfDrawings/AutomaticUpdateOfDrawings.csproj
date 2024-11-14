@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BOM_dt.cs" />
+    <Compile Include="Drawing.cs" />
     <Compile Include="FirstStep.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

@@ -35,8 +35,14 @@ namespace AutomaticUpdateOfDrawings
         public static List<EdmSelItem> SelectionDrawings;
         public static List<string> listdrawings;
         public static IEdmBatchUnlock2 batchUnlocker;
-   
-
+        public static List<Drawing> drawings;
+        public IEdmVault7 vault2 = null;
+        IEdmFile7 aFile;
+        IEdmFolder5 aFolder;
+        IEdmBomMgr bomMgr;
+        string config;
+        int version = -1;
+        public string pathname0;
         public void OnCmd(string pathAss)
         {
             string FileName = pathAss;
@@ -46,6 +52,8 @@ namespace AutomaticUpdateOfDrawings
             IEdmFile5 file5 = null;
             IEdmFolder5 folder5 = null;
             EdmVault5 v = new EdmVault5();
+            drawings = new List<Drawing>();
+
             try 
                 { 
                     if (!v.IsLoggedIn)
@@ -63,10 +71,19 @@ namespace AutomaticUpdateOfDrawings
                         ASMID = file5.ID;
                         ASMFolderID = folder5.ID;
 
-                        Application.Run(new Form1());
+               
+                        vault2 = (IEdmVault7)v;
 
-                    }
-                    else
+                        aFile = (IEdmFile7)vault2.GetObject(EdmObjectType.EdmObject_File, Root.ASMID);
+                        aFolder = (IEdmFolder5)vault2.GetObject(EdmObjectType.EdmObject_Folder, Root.ASMFolderID);
+                        config = Root.strConfig;
+                        version = aFile.CurrentVersion;
+                        pathname0 = aFolder.LocalPath;
+                        
+                        BOM_dt.BOM(aFile, config, version, 2);///1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
+
+                }
+                else
                     {
 
                         MessageBox.Show("Select the assembly model file (.SLDASM)");

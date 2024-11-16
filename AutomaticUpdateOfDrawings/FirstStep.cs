@@ -6,17 +6,16 @@ namespace AutomaticUpdateOfDrawings
 {
     public class FirstStep
     {
-        private IEdmVault5 vault1 = null;
         string path;
         public FirstStep()
         {
     
             try
             {
-            
 
-                path = @"C:\CUBY_PDM\Work\Other\Без проекта\CUBY-V1.1\CAD\Завод контейнер\Склад из контейнеров\Лестница\CUBY-00259479.sldasm";
-               Root ass = new Root();
+                path = @"C:\CUBY_PDM\Work\Other\Без проекта\CUBY-V1.1\CAD\Завод контейнер\Участок сварочный\Кран балка\CUBY-00170130.sldasm";
+              //  path = @"C:\CUBY_PDM\Work\Other\Без проекта\CUBY-V1.1\CAD\Завод контейнер\Склад из контейнеров\Лестница\CUBY-00259479.sldasm";
+                Root ass = new Root();
                 ass.OnCmd(path);
 
             }

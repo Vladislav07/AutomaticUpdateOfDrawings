@@ -31,13 +31,45 @@ namespace AutomaticUpdateOfDrawings
         public SldApp()
         {
             swApp = new SldWorks();
-            swApp.Visible = true;
+            swApp.Visible = false;
             ppoSelection = new EdmSelItem[Root.drawings.Count];
         }
 
         public void Run()
         {
             Message();
+            AddSelItemToList();
+            DrawingsBatchGet();
+            OpenAndRefresh();
+            DrawingsBatchUnLock();
+            swApp.ExitApp();
+
+        }
+
+        void AddSelItemToList()
+        {
+            int i = 0;
+
+            try
+            {
+                Array.Resize(ref ppoSelection, Root.drawings.Count);
+                foreach (Drawing item in Root.drawings)
+                {
+                    ppoSelection[i] = new EdmSelItem();
+                    ppoSelection[i].mlDocID = item.ID_File;
+                    ppoSelection[i].mlProjID = item.ID_Folder;
+                    i++;
+                }
+
+            }
+            catch (System.Runtime.InteropServices.COMException ex)
+            {
+                MessageBox.Show("HRESULT = 0x" + ex.ErrorCode.ToString("X") + " " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
         }
 
         void Message()
@@ -50,7 +82,7 @@ namespace AutomaticUpdateOfDrawings
             MessageBox.Show(str);
         }
 
-        public void AddDrawingsToBatchGet()
+        public void DrawingsBatchGet()
         {
             try
             {
@@ -61,10 +93,17 @@ namespace AutomaticUpdateOfDrawings
 
 
                 batchGetter = (IEdmBatchGet)vault2.CreateUtility(EdmUtility.EdmUtil_BatchGet);
-
-                foreach (Drawing item in Root.drawings)
+                batchGetter.AddSelection((EdmVault5)vault1, ref ppoSelection);
+                if ((batchGetter != null))
                 {
-                    batchGetter.AddSelectionEx((EdmVault5)vault1, item.ID_File, item.ID_Folder, 0);
+
+                    batchGetter.CreateTree(0, (int)EdmGetCmdFlags.Egcf_Lock + (int)EdmGetCmdFlags.Egcf_SkipOpenFileChecks);// + (int)EdmGetCmdFlags.Egcf_IncludeAutoCacheFiles);
+                    retVal = batchGetter.ShowDlg(0);
+                  //  if ((retVal))
+                   // {
+                        batchGetter.GetFiles(0, null);
+                  //  }
+
                 }
 
             }
@@ -79,34 +118,26 @@ namespace AutomaticUpdateOfDrawings
         }
 
         public void DrawingsBatchUnLock()
-        {
-            int i = 0;
-
-
+        {   
             try
             {
-
-                foreach (Drawing item in Root.drawings)
+                if (vault2 == null)
                 {
-                    ppoSelection[i] = new EdmSelItem();
-                    ppoSelection[i].mlDocID = item.ID_File;
-                    ppoSelection[i].mlProjID = item.ID_Folder;
-                    i++;
+                    ConnectPDM();
                 }
-
                 batchUnlocker = (IEdmBatchUnlock2)vault2.CreateUtility(EdmUtility.EdmUtil_BatchUnlock);
                 batchUnlocker.AddSelection((EdmVault5)vault1, ref ppoSelection);
-                batchUnlocker.CreateTree(0, (int)EdmUnlockBuildTreeFlags.Eubtf_Nothing);
+                batchUnlocker.CreateTree(0, (int)EdmUnlockBuildTreeFlags.Eubtf_MayUnlock);
 
                 batchUnlocker.Comment = "Refresh";
-                retVal = batchUnlocker.ShowDlg(0);
-                object statuses = null;
-                if ((retVal))
-                {
+              //  retVal = batchUnlocker.ShowDlg(0);
+              //  object statuses = null;
+               // if ((retVal))
+              //  {
                     batchUnlocker.UnlockFiles(0, null);
-                    statuses = batchUnlocker.GetStatus((int)EdmUnlockStatusFlag.Eusf_CloseAfterCheckinFlag);
-                    Interaction.MsgBox("Close Files after Check In selected? " + statuses);
-                }
+                 //   statuses = batchUnlocker.GetStatus((int)EdmUnlockStatusFlag.Eusf_CloseAfterCheckinFlag+(int)EdmUnlockBuildTreeFlags.Eubtf_SkipOpenFileChecks);
+                   // Interaction.MsgBox("Close Files after Check In selected? " + statuses);
+               // }
 
 
             }
@@ -147,49 +178,16 @@ namespace AutomaticUpdateOfDrawings
                 MessageBox.Show(ex.Message);
             }
         }
-        public void BatchGet()
-        {
-
-            try
-            {
-                if (vault2 == null)
-                {
-                    ConnectPDM();
-                }
-
-                if ((batchGetter != null))
-                {
-
-                    batchGetter.CreateTree(0, (int)EdmGetCmdFlags.Egcf_Lock + (int)EdmGetCmdFlags.Egcf_SkipOpenFileChecks);
-                    retVal = batchGetter.ShowDlg(0);
-                    if ((retVal))
-                    {
-                        batchGetter.GetFiles(0, null);
-                    }
-
-                }
-
-            }
-            catch (System.Runtime.InteropServices.COMException ex)
-            {
-                MessageBox.Show("HRESULT = 0x" + ex.ErrorCode.ToString("X") + " " + ex.Message);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-
-        }
+     
 
         public void OpenAndRefresh()
         {
             ModelDoc2 swModelDoc = default(ModelDoc2);
-
             int errors = 0;
             int warnings = 0;
             int lErrors = 0;
             int lWarnings = 0;
-
+            ModelDocExtension extMod;
             string fileName = null;
 
       
@@ -199,25 +197,22 @@ namespace AutomaticUpdateOfDrawings
                 {
                     fileName = item.NameDraw;
                     swModelDoc = (ModelDoc2)swApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocDRAWING, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
-
-                    swApp.CreateNewWindow();
+                    extMod = swModelDoc.Extension;
+                    // swApp.CreateNewWindow();
+                    extMod.Rebuild((int)swRebuildOptions_e.swForceRebuildAll);
                     swModelDoc.Save3((int)swSaveAsOptions_e.swSaveAsOptions_UpdateInactiveViews, ref lErrors, ref lWarnings);
-                    swModelDoc.Close();
+
+                    MessageBox.Show(lErrors.ToString() + "---" + lWarnings.ToString());
+                    swApp.CloseDoc(fileName);
                     swModelDoc = null;
 
-
                 }
-
-
             }
             catch (Exception)
             {
                 MessageBox.Show(errors.ToString());
 
             }
-
-
-
         }
     }
 }

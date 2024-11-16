@@ -6,3 +6,5 @@ C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawing
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\obj\Debug\AutomaticUpdateOfDrawings.pdb
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\AutomaticUpdateOfDrawings.exe
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\obj\Debug\AutomaticUpdateOfDrawings.exe
+C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\EPDM.Interop.epdm.dll
+C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\obj\Debug\AutomaticUpdateOfDrawings.csproj.CopyComplete

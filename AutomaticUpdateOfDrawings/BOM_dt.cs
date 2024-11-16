@@ -1,11 +1,6 @@
 ﻿using EPDM.Interop.epdm;
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace AutomaticUpdateOfDrawings
@@ -74,14 +69,14 @@ namespace AutomaticUpdateOfDrawings
                         f = poComputedValue.ToString();
 
                     }
-                   /*
+                  
                     if (ppoColumns[Coli].mbsCaption.Contains(Root.strLatestVer))
                     {
                         Row.GetVar(ppoColumns[Coli].mlVariableID, ppoColumns[Coli].meType, out poValue, out poComputedValue, out pbsConfiguration, out pbReadOnly);
-                        LatestVer = (int)poComputedValue;
+                        LatestVer = Convert.ToInt16(poComputedValue);
 
                     }
-                   */
+                   
                   
 
                     if (ppoColumns[Coli].mbsCaption.Contains(Root.strConfig))
@@ -95,11 +90,18 @@ namespace AutomaticUpdateOfDrawings
                         Row.GetVar(ppoColumns[Coli].mlVariableID, ppoColumns[Coli].meType, out poValue, out poComputedValue, out pbsConfiguration, out pbReadOnly);
 
                         Section = poComputedValue.ToString();
+                        /*
+                        if(!(Section == "Сборочные единицы"|| Section == "Детали"))
+                        {
+                            return;
+                        }
+                        */
+
 
                     }
 
 
-                    //Если деталь или сборка, то вносим в таблицу с информацией о наличии чертежа и dxf, иначе игнорим
+                    //Если деталь или сборка
                     if (ppoColumns[Coli].mbsCaption.Contains(Root.strFileName))
                     {
 
@@ -140,7 +142,7 @@ namespace AutomaticUpdateOfDrawings
 
                 if ((bFile != null) && (!bFile.IsLocked)) //true если файл не пусто и зачекинен                                           
                 {
-                    draw = new Drawing(bFile.ID, bFolder.ID, d);
+                    
                     try
                     {
                         int versionDraiwing = bFile.CurrentVersion;
@@ -167,17 +169,19 @@ namespace AutomaticUpdateOfDrawings
                             }
                         }
 
-                        Root.drawings.Add(draw);
+                           if (TrueRowFlag == true && (!(refDrToModel == modelFile.CurrentVersion) || NeedsRegeneration))
+                               {
+                                  draw = new Drawing(bFile.ID, bFolder.ID, d);
+                                  Root.drawings.Add(draw);
+                               }
+                        
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show("error:" + bFile.Name);
+                        MessageBox.Show("error:" + bFile.Name + ex.Message);
 
                     }
-                    //  if (TrueRowFlag == true && (!(refDrToModel == modelFile.CurrentVersion) || NeedsRegeneration))
-                            //   {
-                      
-                            //   }
+                    
                 }
 
             }
@@ -194,7 +198,7 @@ namespace AutomaticUpdateOfDrawings
                 if (Section == "Сборочные единицы")
                 {
               
-                    if (modelFile != null) { BOM(modelFile, Config, LatestVer, 0); }//1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
+                    if (modelFile != null) { BOM(modelFile, Config, LatestVer, 2); }//1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
                 }
             }
 

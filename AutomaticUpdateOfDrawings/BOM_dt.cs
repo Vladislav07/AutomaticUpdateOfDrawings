@@ -15,7 +15,7 @@ namespace AutomaticUpdateOfDrawings
         {
             IEdmBomView bomView;
 
-            bomView = aFile.GetComputedBOM(Root.strFullBOM, version, config, BomFlag); //1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
+            bomView = aFile.GetComputedBOM(Root.strFullBOM, version, config, BomFlag); 
             bomView.GetRows(out object[] ppoRows);
             bomView.GetColumns(out EdmBomColumn[] ppoColumns);
     

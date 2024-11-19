@@ -59,12 +59,13 @@ namespace AutomaticUpdateOfDrawings
                 switch (poCmd.meCmdType)
                 {
 
-                    case EdmCmdType.EdmCmd_PostState:
+                    case EdmCmdType.EdmCmd_PreState:
                         foreach (EdmCmdData AffectedFile in ppoData)
                         {
 
                             if (AffectedFile.mbsStrData2 == "Pending Express Manufacturing")
                             {
+                                
                                 FileName = ((EdmCmdData)ppoData.GetValue(0)).mbsStrData1;
                                 e = System.IO.Path.GetExtension(FileName);
                                 name0 = System.IO.Path.GetFileNameWithoutExtension(FileName);

@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using EPDM.Interop.epdm;
 using SolidWorks.Interop.sldworks;
 using SolidWorks.Interop.swconst;
-using System.Windows.Forms;
-using EPDM.Interop.epdm;
-using Microsoft.VisualBasic;
-using System.Windows.Forms;
-using System.Data;
+using System;
 using System.IO;
+using System.Windows.Forms;
 
 namespace AutomaticUpdateOfDrawings
 {
@@ -23,15 +16,13 @@ namespace AutomaticUpdateOfDrawings
         EdmSelItem[] ppoSelection = null;
         IEdmVault5 vault1 = new EdmVault5();
         IEdmVault7 vault2 = null;
-        EdmSelectionObject poSel;
-        bool retVal;
         IEdmBatchUnlock2 batchUnlocker;
 
 
         public SldApp()
         {
             swApp = new SldWorks();
-            swApp.Visible = false;
+            swApp.Visible = true;
             ppoSelection = new EdmSelItem[Root.drawings.Count];
         }
 
@@ -98,7 +89,7 @@ namespace AutomaticUpdateOfDrawings
                 {
 
                     batchGetter.CreateTree(0, (int)EdmGetCmdFlags.Egcf_Lock + (int)EdmGetCmdFlags.Egcf_SkipOpenFileChecks);// + (int)EdmGetCmdFlags.Egcf_IncludeAutoCacheFiles);
-                    retVal = batchGetter.ShowDlg(0);
+                   // retVal = batchGetter.ShowDlg(0);
                   //  if ((retVal))
                    // {
                         batchGetter.GetFiles(0, null);
@@ -130,13 +121,10 @@ namespace AutomaticUpdateOfDrawings
                 batchUnlocker.CreateTree(0, (int)EdmUnlockBuildTreeFlags.Eubtf_MayUnlock);
 
                 batchUnlocker.Comment = "Refresh";
-              //  retVal = batchUnlocker.ShowDlg(0);
-              //  object statuses = null;
+              // retVal = batchUnlocker.ShowDlg(;
                // if ((retVal))
               //  {
                     batchUnlocker.UnlockFiles(0, null);
-                 //   statuses = batchUnlocker.GetStatus((int)EdmUnlockStatusFlag.Eusf_CloseAfterCheckinFlag+(int)EdmUnlockBuildTreeFlags.Eubtf_SkipOpenFileChecks);
-                   // Interaction.MsgBox("Close Files after Check In selected? " + statuses);
                // }
 
 
@@ -197,12 +185,9 @@ namespace AutomaticUpdateOfDrawings
                 {
                     fileName = item.NameDraw;
                     swModelDoc = (ModelDoc2)swApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocDRAWING, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
-                    extMod = swModelDoc.Extension;
-                    // swApp.CreateNewWindow();
+                    extMod = swModelDoc.Extension;  
                     extMod.Rebuild((int)swRebuildOptions_e.swForceRebuildAll);
                     swModelDoc.Save3((int)swSaveAsOptions_e.swSaveAsOptions_UpdateInactiveViews, ref lErrors, ref lWarnings);
-
-                    MessageBox.Show(lErrors.ToString() + "---" + lWarnings.ToString());
                     swApp.CloseDoc(fileName);
                     swModelDoc = null;
 

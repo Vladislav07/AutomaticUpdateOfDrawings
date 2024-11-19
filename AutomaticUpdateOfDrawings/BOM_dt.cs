@@ -40,10 +40,6 @@ namespace AutomaticUpdateOfDrawings
             string f = "";//Found In
             IEdmFile7 bFile;
 
-
-
-            bool TrueRowFlag = false;
-           // DataRow workRow = dt.NewRow();
             object poValue = null;
             object poComputedValue = null;
             string pbsConfiguration = "";
@@ -90,16 +86,12 @@ namespace AutomaticUpdateOfDrawings
                         Row.GetVar(ppoColumns[Coli].mlVariableID, ppoColumns[Coli].meType, out poValue, out poComputedValue, out pbsConfiguration, out pbReadOnly);
 
                         Section = poComputedValue.ToString();
-                        /*
+                    
                         if(!(Section == "Сборочные единицы"|| Section == "Детали"))
                         {
                             return;
                         }
-                        */
-
-
                     }
-
 
                     //Если деталь или сборка
                     if (ppoColumns[Coli].mbsCaption.Contains(Root.strFileName))
@@ -113,20 +105,20 @@ namespace AutomaticUpdateOfDrawings
 
                         if (poComputedValue.ToString().Contains(".sldasm"))
                         {
-                            TrueRowFlag = true; d = p.Replace(".sldasm", ".SLDDRW");
+                             d = p.Replace(".sldasm", ".SLDDRW");
                         }
                         else if (poComputedValue.ToString().Contains(".SLDASM"))
                         {
-                            TrueRowFlag = true; d = p.Replace(".SLDASM", ".SLDDRW");
+                            d = p.Replace(".SLDASM", ".SLDDRW");
                         }
                         else if (poComputedValue.ToString().Contains(".sldprt"))
                         {
-                            TrueRowFlag = true; d = p.Replace(".sldprt", ".SLDDRW");
+                            d = p.Replace(".sldprt", ".SLDDRW");
 
                         }
                         else if (poComputedValue.ToString().Contains(".SLDPRT"))
                         {
-                            TrueRowFlag = true; d = p.Replace(".SLDPRT", ".SLDDRW");
+                             d = p.Replace(".SLDPRT", ".SLDDRW");
 
                         }
 
@@ -169,7 +161,7 @@ namespace AutomaticUpdateOfDrawings
                             }
                         }
 
-                           if (TrueRowFlag == true && (!(refDrToModel == modelFile.CurrentVersion) || NeedsRegeneration))
+                           if (!(refDrToModel == modelFile.CurrentVersion) || NeedsRegeneration)
                                {
                                   draw = new Drawing(bFile.ID, bFolder.ID, d);
                                   Root.drawings.Add(draw);
@@ -186,20 +178,12 @@ namespace AutomaticUpdateOfDrawings
 
             }
 
-            else
-
-            { TrueRowFlag = false; }//если не первый левел или не 0 левел
-
-
-            
-
-            if (Row.GetTreeLevel() == 1)
+            if (Row.GetTreeLevel() == 1 && Section == "Сборочные единицы")
             {
-                if (Section == "Сборочные единицы")
-                {
+               
               
-                    if (modelFile != null) { BOM(modelFile, Config, LatestVer, 2); }//1//(int)EdmBomFlag.EdmBf_AsBuilt + //2// (int)EdmBomFlag.EdmBf_ShowSelected);
-                }
+                    if (modelFile != null) { BOM(modelFile, Config, LatestVer, 0); }
+                
             }
 
 

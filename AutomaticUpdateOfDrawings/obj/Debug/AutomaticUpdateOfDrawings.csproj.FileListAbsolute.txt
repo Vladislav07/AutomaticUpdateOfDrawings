@@ -1,10 +1,8 @@
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\AutomaticUpdateOfDrawings.pdb
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\obj\Debug\AutomaticUpdateOfDrawings.csproj.AssemblyReference.cache
-C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\obj\Debug\AutomaticUpdateOfDrawings.Form1.resources
-C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\obj\Debug\AutomaticUpdateOfDrawings.csproj.GenerateResource.cache
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\obj\Debug\AutomaticUpdateOfDrawings.csproj.CoreCompileInputs.cache
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\obj\Debug\AutomaticUpdateOfDrawings.pdb
-C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\AutomaticUpdateOfDrawings.exe
-C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\obj\Debug\AutomaticUpdateOfDrawings.exe
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\EPDM.Interop.epdm.dll
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\obj\Debug\AutomaticUpdateOfDrawings.csproj.CopyComplete
+C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\AutomaticUpdateOfDrawings.dll
+C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\obj\Debug\AutomaticUpdateOfDrawings.dll

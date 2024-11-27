@@ -1,57 +1,46 @@
 ﻿using EPDM.Interop.epdm;
+using System.IO;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace AutomaticUpdateOfDrawings
 {
     public class Root : IEdmAddIn5
     {
-
-        public static int ASMID;
-        public static int ASMFolderID;
-        public static string name0;
-        public static string pdmName = "CUBY_PDM";
-        public static string strFullBOM = "FullBOM";
-        public static string strConfig = "Configuration";
-        public static string strFoundIn = "Found_In"; 
-        public static string strFileName = "File_Name";
-        public static string strLatestVer = "Latest_Version";
-        public static string strConfigPoint = ".";
-        public static string strSection = "Section";
+        public static EdmVault5 v = null;
         public static EdmSelItem[] ppoSelection;
         public static List<EdmSelItem> SelectionDrawings;
         public static List<string> listdrawings;
         public static IEdmBatchUnlock2 batchUnlocker;
         public static List<Drawing> drawings;
         public IEdmVault7 vault2 = null;
-        IEdmFile7 aFile;
-        IEdmFolder5 aFolder;
-        string config;
-        int version = -1;
         public string pathname0;
-      
+
         public void GetAddInInfo(ref EdmAddInInfo poInfo, IEdmVault5 poVault, IEdmCmdMgr5 poCmdMgr)
         {
             //Specify information to display in the add-in's Properties dialog box
             poInfo.mbsAddInName = "AutomaticUpdateOfDrawings_1.0.0";
             poInfo.mbsCompany = "CUBY";
-            poInfo.mbsDescription = "Create specification FullBOM";
+            poInfo.mbsDescription = "Rebuild drawings";
             poInfo.mlAddInVersion = 050419;
             poInfo.mlRequiredVersionMajor = 27;
             poInfo.mlRequiredVersionMinor = 1;
 
             poCmdMgr.AddHook(EdmCmdType.EdmCmd_PreState);
-           
+
         }
 
         public void OnCmd(ref EdmCmd poCmd, ref EdmCmdData[] ppoData)
         {
             string FileName;
             string e;
-            IEdmFile5 file5 = null;
-            IEdmFolder5 folder5 = null;
-            EdmVault5 v = new EdmVault5();
+            string designation;
+            Dictionary<string, string> model = new Dictionary<string, string>();
+            Dictionary<string, string> drawing = new Dictionary<string, string>();
+
+            v = (EdmVault5)poCmd.mpoVault;
             drawings = new List<Drawing>();
 
             try
@@ -65,42 +54,43 @@ namespace AutomaticUpdateOfDrawings
 
                             if (AffectedFile.mbsStrData2 == "Pending Express Manufacturing")
                             {
-                                
-                                FileName = ((EdmCmdData)ppoData.GetValue(0)).mbsStrData1;
-                                e = System.IO.Path.GetExtension(FileName);
-                                name0 = System.IO.Path.GetFileNameWithoutExtension(FileName);
-                                ASMID = ((EdmCmdData)ppoData.GetValue(0)).mlObjectID1;
-                                ASMFolderID = ((EdmCmdData)ppoData.GetValue(0)).mlObjectID2;
 
-                                if (!v.IsLoggedIn)
+                                FileName = AffectedFile.mbsStrData1;
+                                e = Path.GetExtension(FileName);
+                                designation = Path.GetFileNameWithoutExtension(FileName);
+
+                                string regCuby = @"^CUBY-\d{8}$";
+                                bool IsCUBY = Regex.IsMatch(designation, regCuby);
+                                if (!IsCUBY) continue;
+
+                                switch (e)
                                 {
-                                    v.LoginAuto("CUBY_PDM", 0);
-                                    // MessageBox.Show("Ok!!!");
+                                    case "sldasm":
+                                        model.Add(designation, FileName);
+                                        break;
+                                    case ".sldprt":
+                                        model.Add(designation, FileName);
+                                        break;
+                                    case "SLDASM":
+                                        model.Add(designation, FileName);
+                                        break;
+                                    case "SLDPRT":
+                                        model.Add(designation, FileName);
+                                        break;
+                                    case ".SLDDRW":
+                                        drawing.Add(designation, FileName);
+                                        break;
+                                    case ".slddrw":
+                                        drawing.Add(designation, FileName);
+                                        break;
+                                    default:
+                                        break;
                                 }
 
-                                file5 = v.GetFileFromPath(FileName, out folder5);
-
-                                if ((e == ".sldasm") || (e == ".SLDASM"))   //replace slddrw
-                                {
-
-
-                                    ASMID = file5.ID;
-                                    ASMFolderID = folder5.ID;
-
-
-                                    vault2 = (IEdmVault7)v;
-
-                                    aFile = (IEdmFile7)vault2.GetObject(EdmObjectType.EdmObject_File, ASMID);
-                                    aFolder = (IEdmFolder5)vault2.GetObject(EdmObjectType.EdmObject_Folder, ASMFolderID);
-                                    config = strConfig;
-                                    version = aFile.CurrentVersion;
-                                    pathname0 = aFolder.LocalPath;
-
-                                    BOM_dt.BOM(aFile, config, version, 2);
-                                }
                             }
 
                         }
+
 
                         break;
                     //The event isn't registered
@@ -109,7 +99,8 @@ namespace AutomaticUpdateOfDrawings
                         break;
                 }
             }
-
+                
+            
 
             catch (System.Runtime.InteropServices.COMException ex)
             {
@@ -120,7 +111,87 @@ namespace AutomaticUpdateOfDrawings
                 MessageBox.Show(ex.Message);
             }
 
+            foreach (var item in drawing)
+            {
+                string key = item.Key;
+                string valueD = item.Value;
+                string valueM;
+                bool isGet = false;
+                if (model.ContainsKey(key))
+                {
+                    isGet = model.TryGetValue(key, out valueM);
+                
+                    if(isGet && valueM != null)
+                    {
+                        IsDrawingsRebuild(valueM, valueD);
+                    }
+                }
+            }
 
+
+        }
+
+        void IsDrawingsRebuild(string p, string d)
+        {
+            int refDrToModel = -1;
+            bool NeedsRegeneration = false;
+
+            IEdmFile7 modelFile = null;
+            IEdmFile7 bFile = null;
+
+            Drawing draw = null;
+
+            if ((modelFile != null) && (!modelFile.IsLocked))
+            {
+                modelFile = (IEdmFile7)v.GetFileFromPath(p, out IEdmFolder5 modelFolder);
+                refDrToModel = modelFile.CurrentVersion;
+            }
+
+
+            bFile = (IEdmFile7)v.GetFileFromPath(d, out IEdmFolder5 bFolder);
+
+            if ((bFile != null) && (!bFile.IsLocked)) //true если файл не пусто и зачекинен                                           
+            {
+
+                try
+                {
+                    int versionDraiwing = bFile.CurrentVersion;
+                    NeedsRegeneration = bFile.NeedsRegeneration(versionDraiwing, bFolder.ID);
+
+                    // Достаем из чертежа версию ссылки на родителя (VersionRef)
+                    IEdmReference5 ref5 = bFile.GetReferenceTree(bFolder.ID);
+                    IEdmReference10 ref10 = (IEdmReference10)ref5;
+                    IEdmPos5 pos = ref10.GetFirstChildPosition3("A", true, true, (int)EdmRefFlags.EdmRef_File, "", 0);
+                    while (!pos.IsNull)
+                    {
+
+                        IEdmReference10 @ref = (IEdmReference10)ref5.GetNextChild(pos);
+
+                        string extension = Path.GetExtension(@ref.Name);
+                        if (extension == ".sldasm" || extension == ".sldprt" || extension == ".SLDASM" || extension == ".SLDPRT")
+                        {
+                            refDrToModel = @ref.VersionRef;
+                            break;
+                        }
+                        else
+                        {
+                            ref5.GetNextChild(pos);
+                        }
+                    }
+
+                    if (!(refDrToModel == modelFile.CurrentVersion) || NeedsRegeneration)
+                    {
+                        draw = new Drawing(bFile.ID, bFolder.ID, d);
+                        Root.drawings.Add(draw);
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("error:" + bFile.Name + ex.Message);
+
+                }
+            }
         }
     }
 }

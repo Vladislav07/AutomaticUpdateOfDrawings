@@ -9,3 +9,8 @@ C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawing
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\01\AutomaticUpdateOfDrawings.dll
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\01\AutomaticUpdateOfDrawings.pdb
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\01\EPDM.Interop.epdm.dll
+C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\obj\Debug\Interop.EdmLib.dll
+C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\obj\Debug\AutomaticUpdateOfDrawings.csproj.ResolveComReference.cache
+C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\02\AutomaticUpdateOfDrawings.dll
+C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\02\AutomaticUpdateOfDrawings.pdb
+C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\02\EPDM.Interop.epdm.dll

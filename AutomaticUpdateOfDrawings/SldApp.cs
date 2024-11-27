@@ -14,13 +14,15 @@ namespace AutomaticUpdateOfDrawings
 
         IEdmBatchGet batchGetter;
         EdmSelItem[] ppoSelection = null;
-        IEdmVault5 vault1 = new EdmVault5();
+        IEdmVault5 vault1 =null;
         IEdmVault7 vault2 = null;
         IEdmBatchUnlock2 batchUnlocker;
 
 
         public SldApp()
         {
+            IEdmVault5 vault1 = Root.v;
+            IEdmVault7 vault2 = (IEdmVault7)vault1;
             swApp = new SldWorks();
             swApp.Visible = true;
             ppoSelection = new EdmSelItem[Root.drawings.Count];
@@ -77,10 +79,7 @@ namespace AutomaticUpdateOfDrawings
         {
             try
             {
-                if (vault2 == null)
-                {
-                    ConnectPDM();
-                }
+                
 
 
                 batchGetter = (IEdmBatchGet)vault2.CreateUtility(EdmUtility.EdmUtil_BatchGet);
@@ -112,10 +111,7 @@ namespace AutomaticUpdateOfDrawings
         {   
             try
             {
-                if (vault2 == null)
-                {
-                    ConnectPDM();
-                }
+               
                 batchUnlocker = (IEdmBatchUnlock2)vault2.CreateUtility(EdmUtility.EdmUtil_BatchUnlock);
                 batchUnlocker.AddSelection((EdmVault5)vault1, ref ppoSelection);
                 batchUnlocker.CreateTree(0, (int)EdmUnlockBuildTreeFlags.Eubtf_MayUnlock);
@@ -140,32 +136,7 @@ namespace AutomaticUpdateOfDrawings
 
         }
 
-        void ConnectPDM()
-        {
-            try
-            {
-                if (vault1 == null)
-                {
-                    vault1 = new EdmVault5();
-                }
-
-
-                if (!vault1.IsLoggedIn)
-                {
-                    vault1.LoginAuto(Root.pdmName, 0);
-                }
-
-                vault2 = (IEdmVault7)vault1;
-            }
-            catch (System.Runtime.InteropServices.COMException ex)
-            {
-                MessageBox.Show("HRESULT = 0x" + ex.ErrorCode.ToString("X") + " " + ex.Message);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
+      
      
 
         public void OpenAndRefresh()

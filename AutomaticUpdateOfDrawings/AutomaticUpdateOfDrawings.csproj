@@ -17,10 +17,11 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\01\</OutputPath>
+    <OutputPath>bin\Debug\02\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -59,11 +60,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BOM_dt.cs" />
     <Compile Include="Drawing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Root.cs" />
     <Compile Include="SldApp.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="EdmLib">
+      <Guid>{5FA2C692-8393-4F31-9BDB-05E6F807D0D3}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>22</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

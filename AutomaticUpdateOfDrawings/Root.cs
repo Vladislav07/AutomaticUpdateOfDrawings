@@ -17,7 +17,7 @@ namespace AutomaticUpdateOfDrawings
         public static List<Drawing> drawings;
         public IEdmVault7 vault2 = null;
         public string pathname0;
-
+        static SldApp sldApp = null;
         public void GetAddInInfo(ref EdmAddInInfo poInfo, IEdmVault5 poVault, IEdmCmdMgr5 poCmdMgr)
         {
             //Specify information to display in the add-in's Properties dialog box
@@ -52,7 +52,7 @@ namespace AutomaticUpdateOfDrawings
                         foreach (EdmCmdData AffectedFile in ppoData)
                         {
 
-                            if (AffectedFile.mbsStrData2 == "Pending Express Manufacturing")
+                            if (true)  /// "Pending Express Manufacturing")
                             {
 
                                 FileName = AffectedFile.mbsStrData1;
@@ -61,7 +61,7 @@ namespace AutomaticUpdateOfDrawings
 
                                 string regCuby = @"^CUBY-\d{8}$";
                                 bool IsCUBY = Regex.IsMatch(designation, regCuby);
-                                if (!IsCUBY) continue;
+                              //  if (!IsCUBY) continue;
 
                                 switch (e)
                                 {
@@ -90,7 +90,7 @@ namespace AutomaticUpdateOfDrawings
                             }
 
                         }
-
+                        MessageBox.Show(drawing.Count.ToString() + "  --  " + model.Count.ToString());
 
                         break;
                     //The event isn't registered
@@ -126,6 +126,14 @@ namespace AutomaticUpdateOfDrawings
                         IsDrawingsRebuild(valueM, valueD);
                     }
                 }
+            }
+
+            MessageBox.Show(drawings.Count.ToString());
+
+            if (drawings.Count > 0)
+            {
+                sldApp = new SldApp();
+                sldApp.Run();
             }
 
 

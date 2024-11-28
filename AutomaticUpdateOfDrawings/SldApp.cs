@@ -68,10 +68,10 @@ namespace AutomaticUpdateOfDrawings
 
         void Message()
         {
-            string str = "";
+            string str = "Файлы для перестроения:" + '\n';
             foreach (Drawing item in Root.drawings)
             {
-                str = str + Path.GetFileName(item.NameDraw);
+                str = str +  Path.GetFileName(item.NameDraw) + '\n';
             }
             MessageBox.Show(str);
         }
@@ -149,17 +149,40 @@ namespace AutomaticUpdateOfDrawings
             int lWarnings = 0;
             ModelDocExtension extMod;
             string fileName = null;
+            DrawingDoc swDraw = default(DrawingDoc);
+            object[] vSheetName = null;
+            string sheetName;
+            int i = 0;
+            bool bRet = false;
 
-      
             try
             {
                 foreach (Drawing item in Root.drawings)
                 {
                     fileName = item.NameDraw;
                     swModelDoc = (ModelDoc2)swApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocDRAWING, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
-                    extMod = swModelDoc.Extension;  
-                    extMod.Rebuild((int)swRebuildOptions_e.swRebuildAll);
+                    swDraw = (DrawingDoc)swModelDoc;
+                    extMod = swModelDoc.Extension;
+                    vSheetName = (object[])swDraw.GetSheetNames();
+                    for (i = 0; i < vSheetName.Length; i++)
+
+                    {
+
+                        sheetName = (string)vSheetName[i];
+
+                        bRet = swDraw.ActivateSheet(sheetName);
+
+                         extMod.Rebuild((int)swRebuildOptions_e.swCurrentSheetDisp);
+                        swModelDoc.Save3((int)swSaveAsOptions_e.swSaveAsOptions_UpdateInactiveViews, ref lErrors, ref lWarnings);
+                        Sheet swSheet = default(Sheet);
+
+                         swSheet = (Sheet)swDraw.GetCurrentSheet();
+                         MessageBox.Show(sheetName);
+
+                    }
+ 
                     swModelDoc.Save3((int)swSaveAsOptions_e.swSaveAsOptions_UpdateInactiveViews, ref lErrors, ref lWarnings);
+                    MessageBox.Show(lWarnings.ToString());
                     swApp.CloseDoc(fileName);
                     swModelDoc = null;
 

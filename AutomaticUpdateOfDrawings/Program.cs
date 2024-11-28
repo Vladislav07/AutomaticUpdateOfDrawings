@@ -19,13 +19,13 @@ namespace AutomaticUpdateOfDrawings
 
             poCmd.mpoVault = vault1;
             poCmd.meCmdType = EdmCmdType.EdmCmd_PreState;
-            ppoData[0].mbsStrData1 = @"C:\CUBY_PDM\Work\Other\Без проекта\CUBY-V1.1\CAD\Завод контейнер\Участок сварочный\Кран балка\CUBY-00170132.sldprt";
+            ppoData[0].mbsStrData1 = @"C:\CUBY_PDM\Work\Other\Без проекта\CUBY-V1.1\CAD\Завод контейнер\14 Участок изготовления сэндвич панелей\Кран балка для штрипсы\CUBY-00266509.SLDASM";
             ppoData[0].mbsStrData2 = @"Pending Express Manufacturing";
-            ppoData[1].mbsStrData1 = @"C:\CUBY_PDM\Work\Other\Без проекта\CUBY-V1.1\CAD\Завод контейнер\Участок сварочный\Кран балка\CUBY-00170132.SLDDRW";
+            ppoData[1].mbsStrData1 = @"C:\CUBY_PDM\Work\Other\Без проекта\CUBY-V1.1\CAD\Завод контейнер\14 Участок изготовления сэндвич панелей\Кран балка для штрипсы\CUBY-00266731.SLDASM";
             ppoData[1].mbsStrData2 = @"Pending Express Manufacturing";
-            ppoData[2].mbsStrData1 = @"C:\CUBY_PDM\Work\Other\Без проекта\CUBY-V1.1\CAD\Завод контейнер\Участок сварочный\Кран балка\CUBY-00170130.sldasm";
+            ppoData[2].mbsStrData1 = @"C:\CUBY_PDM\Work\Other\Без проекта\CUBY-V1.1\CAD\Завод контейнер\14 Участок изготовления сэндвич панелей\Кран балка для штрипсы\CUBY-00266509.SLDDRW";
             ppoData[2].mbsStrData2 = @"Pending Express Manufacturing";
-            ppoData[3].mbsStrData1 = @"C:\CUBY_PDM\Work\Other\Без проекта\CUBY-V1.1\CAD\Завод контейнер\Участок сварочный\Кран балка\CUBY-00170130.SLDDRW";
+            ppoData[3].mbsStrData1 = @"C:\CUBY_PDM\Work\Other\Без проекта\CUBY-V1.1\CAD\Завод контейнер\14 Участок изготовления сэндвич панелей\Кран балка для штрипсы\CUBY-00266731.SLDDRW";
             ppoData[3].mbsStrData2 = @"Pending Express Manufacturing";
 
             Root test = new Root();

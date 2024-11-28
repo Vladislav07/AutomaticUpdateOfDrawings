@@ -13,19 +13,20 @@ namespace AutomaticUpdateOfDrawings
 
 
         IEdmBatchGet batchGetter;
-        EdmSelItem[] ppoSelection = null;
-        IEdmVault5 vault1 =null;
+        static EdmSelItem[] ppoSelection = null;
+        static IEdmVault5 vault1 =null;
         IEdmVault7 vault2 = null;
         IEdmBatchUnlock2 batchUnlocker;
-
+       
 
         public SldApp()
         {
-            IEdmVault5 vault1 = Root.v;
-            IEdmVault7 vault2 = (IEdmVault7)vault1;
+           // IEdmVault5 vault1 = vau;
+           // IEdmVault7 vault2 = (IEdmVault7)vault1;
             swApp = new SldWorks();
             swApp.Visible = true;
             ppoSelection = new EdmSelItem[Root.drawings.Count];
+            Run();
         }
 
         public void Run()
@@ -35,7 +36,7 @@ namespace AutomaticUpdateOfDrawings
             DrawingsBatchGet();
             OpenAndRefresh();
             DrawingsBatchUnLock();
-            swApp.ExitApp();
+           // swApp.ExitApp();
 
         }
 
@@ -79,20 +80,20 @@ namespace AutomaticUpdateOfDrawings
         {
             try
             {
-                
+               
 
 
-                batchGetter = (IEdmBatchGet)vault2.CreateUtility(EdmUtility.EdmUtil_BatchGet);
-                batchGetter.AddSelection((EdmVault5)vault1, ref ppoSelection);
+                batchGetter = (IEdmBatchGet)Root.v2.CreateUtility(EdmUtility.EdmUtil_BatchGet);
+                batchGetter.AddSelection((EdmVault5)Root.v, ref ppoSelection);
                 if ((batchGetter != null))
                 {
 
                     batchGetter.CreateTree(0, (int)EdmGetCmdFlags.Egcf_Lock + (int)EdmGetCmdFlags.Egcf_SkipOpenFileChecks);// + (int)EdmGetCmdFlags.Egcf_IncludeAutoCacheFiles);
-                   // retVal = batchGetter.ShowDlg(0);
-                  //  if ((retVal))
-                   // {
+                   bool retVal = batchGetter.ShowDlg(0);
+                    if ((retVal))
+                    {
                         batchGetter.GetFiles(0, null);
-                  //  }
+                    }
 
                 }
 
@@ -112,16 +113,16 @@ namespace AutomaticUpdateOfDrawings
             try
             {
                
-                batchUnlocker = (IEdmBatchUnlock2)vault2.CreateUtility(EdmUtility.EdmUtil_BatchUnlock);
-                batchUnlocker.AddSelection((EdmVault5)vault1, ref ppoSelection);
+                batchUnlocker = (IEdmBatchUnlock2)Root.v2.CreateUtility(EdmUtility.EdmUtil_BatchUnlock);
+                batchUnlocker.AddSelection((EdmVault5)Root.v, ref ppoSelection);
                 batchUnlocker.CreateTree(0, (int)EdmUnlockBuildTreeFlags.Eubtf_MayUnlock);
 
                 batchUnlocker.Comment = "Refresh";
-              // retVal = batchUnlocker.ShowDlg(;
-               // if ((retVal))
-              //  {
+                bool retVal = batchUnlocker.ShowDlg(0);
+                if ((retVal))
+                {
                     batchUnlocker.UnlockFiles(0, null);
-               // }
+                }
 
 
             }
@@ -157,7 +158,7 @@ namespace AutomaticUpdateOfDrawings
                     fileName = item.NameDraw;
                     swModelDoc = (ModelDoc2)swApp.OpenDoc6(fileName, (int)swDocumentTypes_e.swDocDRAWING, (int)swOpenDocOptions_e.swOpenDocOptions_Silent, "", ref errors, ref warnings);
                     extMod = swModelDoc.Extension;  
-                    extMod.Rebuild((int)swRebuildOptions_e.swForceRebuildAll);
+                    extMod.Rebuild((int)swRebuildOptions_e.swRebuildAll);
                     swModelDoc.Save3((int)swSaveAsOptions_e.swSaveAsOptions_UpdateInactiveViews, ref lErrors, ref lWarnings);
                     swApp.CloseDoc(fileName);
                     swModelDoc = null;

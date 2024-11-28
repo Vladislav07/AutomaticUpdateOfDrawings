@@ -5,7 +5,6 @@ C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawing
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\EPDM.Interop.epdm.dll
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\obj\Debug\AutomaticUpdateOfDrawings.csproj.CopyComplete
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\AutomaticUpdateOfDrawings.dll
-C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\obj\Debug\AutomaticUpdateOfDrawings.dll
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\01\AutomaticUpdateOfDrawings.dll
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\01\AutomaticUpdateOfDrawings.pdb
 C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\01\EPDM.Interop.epdm.dll
@@ -37,3 +36,7 @@ C:\Users\belov\source\DRAW\AutomaticUpdateOfDrawings\bin\Debug\05\AutomaticUpdat
 C:\Users\belov\source\DRAW\AutomaticUpdateOfDrawings\bin\Debug\05\AutomaticUpdateOfDrawings.pdb
 C:\Users\belov\source\DRAW\AutomaticUpdateOfDrawings\bin\Debug\05\AutomaticUpdateOfDrawings.tlb
 C:\Users\belov\source\DRAW\AutomaticUpdateOfDrawings\bin\Debug\05\EPDM.Interop.epdm.dll
+C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\05\AutomaticUpdateOfDrawings.exe
+C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\05\AutomaticUpdateOfDrawings.pdb
+C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\bin\Debug\05\EPDM.Interop.epdm.dll
+C:\Users\v.belov\source\repos\AutomaticUpdateOfDrawings\AutomaticUpdateOfDrawings\obj\Debug\AutomaticUpdateOfDrawings.exe

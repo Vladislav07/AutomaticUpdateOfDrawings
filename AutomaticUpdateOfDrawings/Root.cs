@@ -7,9 +7,10 @@ using System.Windows.Forms;
 
 namespace AutomaticUpdateOfDrawings
 {
-    public class Root : IEdmAddIn5
+    public class Root // : IEdmAddIn5
     {
         public static EdmVault5 v = null;
+        public static IEdmVault7 v2 = null;
         public static EdmSelItem[] ppoSelection;
         public static List<EdmSelItem> SelectionDrawings;
         public static List<string> listdrawings;
@@ -32,7 +33,7 @@ namespace AutomaticUpdateOfDrawings
 
         }
 
-        public void OnCmd(ref EdmCmd poCmd, ref EdmCmdData[] ppoData)
+        public void OnCmd (EdmCmd poCmd, EdmCmdData[] ppoData)                         //(ref EdmCmd poCmd, ref EdmCmdData[] ppoData)
         {
             string FileName;
             string e;
@@ -41,6 +42,7 @@ namespace AutomaticUpdateOfDrawings
             Dictionary<string, string> drawing = new Dictionary<string, string>();
 
             v = (EdmVault5)poCmd.mpoVault;
+            v2 = (IEdmVault7)v;
             drawings = new List<Drawing>();
 
             try
@@ -52,7 +54,7 @@ namespace AutomaticUpdateOfDrawings
                         foreach (EdmCmdData AffectedFile in ppoData)
                         {
 
-                            if (true)  /// "Pending Express Manufacturing")
+                            if (AffectedFile.mbsStrData2 == @"Pending Express Manufacturing")
                             {
 
                                 FileName = AffectedFile.mbsStrData1;
@@ -61,20 +63,20 @@ namespace AutomaticUpdateOfDrawings
 
                                 string regCuby = @"^CUBY-\d{8}$";
                                 bool IsCUBY = Regex.IsMatch(designation, regCuby);
-                              //  if (!IsCUBY) continue;
+                                if (!IsCUBY) continue;
 
                                 switch (e)
                                 {
-                                    case "sldasm":
+                                    case ".sldasm":
                                         model.Add(designation, FileName);
                                         break;
                                     case ".sldprt":
                                         model.Add(designation, FileName);
                                         break;
-                                    case "SLDASM":
+                                    case ".SLDASM":
                                         model.Add(designation, FileName);
                                         break;
-                                    case "SLDPRT":
+                                    case ".SLDPRT":
                                         model.Add(designation, FileName);
                                         break;
                                     case ".SLDDRW":
@@ -133,9 +135,9 @@ namespace AutomaticUpdateOfDrawings
             if (drawings.Count > 0)
             {
                 sldApp = new SldApp();
-                sldApp.Run();
+                //sldApp.Run();
             }
-
+            MessageBox.Show("End");
 
         }
 
@@ -148,10 +150,11 @@ namespace AutomaticUpdateOfDrawings
             IEdmFile7 bFile = null;
 
             Drawing draw = null;
+            modelFile = (IEdmFile7)v.GetFileFromPath(p, out IEdmFolder5 modelFolder);
 
             if ((modelFile != null) && (!modelFile.IsLocked))
             {
-                modelFile = (IEdmFile7)v.GetFileFromPath(p, out IEdmFolder5 modelFolder);
+                
                 refDrToModel = modelFile.CurrentVersion;
             }
 
